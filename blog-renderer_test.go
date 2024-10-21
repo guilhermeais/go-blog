@@ -22,7 +22,8 @@ func TestRender(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		want := `<h1>hello, world!</h1>`
+		want := `<h1>hello, world!</h1><p>This is a description</p>Tags: <ul><li>dev</li><li>go</li><li>tdd</li></ul>`
+
 		got := buf.String()
 
 		if got != want {
