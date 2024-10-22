@@ -6,23 +6,26 @@ import (
 	"text/template"
 )
 
-type Post struct {
-	Title, Body, Description string
-	Tags                     []string
-}
-
 var (
 	//go:embed "templates/*"
 	postTemplate embed.FS
 )
 
-func Render(w io.Writer, post Post) error {
+type PostRenderer struct {
+	templ *template.Template
+}
+
+func NewPostRenderer() (*PostRenderer, error) {
 	templ, err := template.ParseFS(postTemplate, "templates/*.gohtml")
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	if err := templ.ExecuteTemplate(w, "blog.gohtml", post); err != nil {
+	return &PostRenderer{templ}, nil
+}
+
+func (r PostRenderer) Render(w io.Writer, post Post) error {
+	if err := r.templ.ExecuteTemplate(w, "blog.gohtml", post); err != nil {
 		return err
 	}
 
