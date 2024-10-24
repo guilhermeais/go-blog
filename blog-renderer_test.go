@@ -31,6 +31,22 @@ func TestRender(t *testing.T) {
 
 		approvals.VerifyString(t, buf.String())
 	})
+
+	t.Run("it converts a single post into HTML with markdown on body", func(t *testing.T) {
+		aPostWithMarkdownBody := blogrenderer.Post{
+			Title:       "hello, world!",
+			Body:        "## Hello, word\nthis is a **hello, wold** text using **markdown**",
+			Description: "This is a description",
+			Tags:        []string{"dev", "go", "tdd"},
+		}
+		buf := bytes.Buffer{}
+
+		if err := postRenderer.Render(&buf, aPostWithMarkdownBody); err != nil {
+			t.Fatal(err)
+		}
+
+		approvals.VerifyString(t, buf.String())
+	})
 }
 
 func BenchmarkRender(b *testing.B) {

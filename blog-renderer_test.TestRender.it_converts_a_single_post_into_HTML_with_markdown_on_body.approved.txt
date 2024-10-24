@@ -25,7 +25,8 @@
 
 Tags: <ul><li>dev</li><li>go</li><li>tdd</li></ul>
 
-<p>this is my first post</p>
+<h2>Hello, word</h2>
+<p>this is a <strong>hello, wold</strong> text using <strong>markdown</strong></p>
 
 
 </main>
