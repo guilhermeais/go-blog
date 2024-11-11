@@ -5,7 +5,6 @@ import (
 	"embed"
 	"fmt"
 	"io"
-	"strings"
 	"text/template"
 
 	"github.com/yuin/goldmark"
@@ -45,12 +44,8 @@ func (r PostRenderer) Render(w io.Writer, post Post) error {
 }
 
 func (r PostRenderer) RenderIndex(w io.Writer, posts []Post) error {
-	indexTemplate := `<ol>{{range .}}<li><a href="/post/{{titleToSlug .Title}}">{{.Title}}</a></li>{{end}}</ol>`
-	templ, err := template.New("index").Funcs(template.FuncMap{
-		"titleToSlug": func(title string) string {
-			return strings.ToLower(strings.ReplaceAll(title, " ", "-"))
-		},
-	}).Parse(indexTemplate)
+	indexTemplate := `<ol>{{range .}}<li><a href="/post/{{.SanitisedTitle}}">{{.Title}}</a></li>{{end}}</ol>`
+	templ, err := template.New("index").Parse(indexTemplate)
 
 	if err != nil {
 		return err
