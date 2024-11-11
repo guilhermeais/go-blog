@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"embed"
 	"fmt"
+	"html/template"
 	"io"
-	"text/template"
 
 	"github.com/yuin/goldmark"
 )
@@ -29,14 +29,12 @@ func NewPostRenderer() (*PostRenderer, error) {
 }
 
 func (r PostRenderer) Render(w io.Writer, post Post) error {
-	var bodyMdToHtml bytes.Buffer
-	if err := goldmark.Convert([]byte(post.Body), &bodyMdToHtml); err != nil {
-		return fmt.Errorf("error on converting body to html: %q", err.Error())
+	postVm, err := newPostVM(post)
+	if err != nil {
+		return err
 	}
 
-	post.Body = bodyMdToHtml.String()
-
-	if err := r.templ.ExecuteTemplate(w, "blog.gohtml", post); err != nil {
+	if err := r.templ.ExecuteTemplate(w, "blog.gohtml", postVm); err != nil {
 		return err
 	}
 
@@ -45,4 +43,20 @@ func (r PostRenderer) Render(w io.Writer, post Post) error {
 
 func (r PostRenderer) RenderIndex(w io.Writer, posts []Post) error {
 	return r.templ.ExecuteTemplate(w, "index.gohtml", posts)
+}
+
+type postViewModel struct {
+	Post
+	HTMLBody template.HTML
+}
+
+func newPostVM(p Post) (*postViewModel, error) {
+	var bodyMdToHtml bytes.Buffer
+	if err := goldmark.Convert([]byte(p.Body), &bodyMdToHtml); err != nil {
+		return nil, fmt.Errorf("error on converting body to html: %q", err.Error())
+	}
+
+	vm := &postViewModel{p, template.HTML(bodyMdToHtml.String())}
+
+	return vm, nil
 }
